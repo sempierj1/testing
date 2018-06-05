@@ -48,8 +48,11 @@ class Dashboard extends Component {
     window.location = "/";
   };
 
+//Get Count of All Members of All Types
   memberTypes = () => {
-    let counts = new Map();
+    
+    //Create Map to store counts.
+    var counts = new Map();
 
     counts.set("Family Membership", 0);
     counts.set("Single Membership", 0);
@@ -57,13 +60,11 @@ class Dashboard extends Component {
     counts.set("Lifetime Member", 0);
     counts.set("Senior Couple", 0);
     counts.set("Basic Membership", 0);
-
+  
+    //Get all Badge Numbers from Database
     var ref = firebase.database().ref("badges");
-
-    const store = (c) => {
-      counts = c;
-    }
-
+    
+    //Iterates on map to check which membership type and increment that value in the counts map.
     const getTypes = (value, key, map) => {
       var newref = firebase.database().ref("users/" + value + "/type");
       newref.once("value", data => {
@@ -75,8 +76,11 @@ class Dashboard extends Component {
       });
 
     };
-
+    
     console.log(counts);
+    
+    //Sorts the badge numbers to get one person from each to avoid duplicate counts
+    //Calls getTypes to count types on the created map.
     ref.once("value", data => {
       var temp = data.val();
       var map = new Map();
@@ -85,14 +89,16 @@ class Dashboard extends Component {
       });
       map.forEach(getTypes);
     });
-
+    
+    //Updates state to contain the counts of memberships
     this.setState({
       getType: true,
       singleCount: counts.get("Single Membership"),
       seniorCount: counts.get("Senior Membership"),
       familyCount: counts.get("Family Membership")
     });
-
+    
+    //returns dataset
     return {
       datasets: [
         {
